@@ -5,6 +5,14 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     return res.status(405).json({ error: 'Method not allowed' })
   }
 
+  const frontendPassword = process.env['FRONTEND_PASSWORD']
+  if (frontendPassword) {
+    const provided = req.headers['x-password']
+    if (provided !== frontendPassword) {
+      return res.status(401).json({ error: 'Unauthorized' })
+    }
+  }
+
   const { text } = req.body as { text?: unknown }
 
   if (!text || typeof text !== 'string') {

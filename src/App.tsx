@@ -43,6 +43,9 @@ const iconBtn: React.CSSProperties = {
 }
 
 export default function App() {
+  const [password, setPassword] = useState(() => sessionStorage.getItem('alfred_pw') ?? '')
+  const [pwInput, setPwInput] = useState('')
+  const [pwError, setPwError] = useState(false)
   const [messages, setMessages] = useState<Message[]>(INITIAL_MESSAGES)
   const [input, setInput] = useState('')
   const [thinking, setThinking] = useState(false)
@@ -54,10 +57,25 @@ export default function App() {
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' })
   }, [messages, thinking])
 
+  async function verifyAndLogin() {
+    const res = await fetch('/api/chat', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'X-Password': pwInput },
+      body: JSON.stringify({ text: 'ping' }),
+    })
+    if (res.status === 401) {
+      setPwError(true)
+    } else {
+      sessionStorage.setItem('alfred_pw', pwInput)
+      setPassword(pwInput)
+      setPwError(false)
+    }
+  }
+
   async function callApi(text: string): Promise<string> {
     const res = await fetch('/api/chat', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 'Content-Type': 'application/json', 'X-Password': password },
       body: JSON.stringify({ text }),
     })
     if (!res.ok) throw new Error(`Request failed: ${res.status}`)
@@ -95,6 +113,66 @@ export default function App() {
     setInput('')
     setShowRecs(true)
     setThinking(false)
+  }
+
+  if (!password) {
+    return (
+      <div style={{
+        position: 'fixed', inset: 0, display: 'flex', alignItems: 'center',
+        justifyContent: 'center', background: '#0D0015',
+      }}>
+        <div style={{
+          background: '#1A0828', borderRadius: 20, padding: '40px 36px',
+          width: 340, boxShadow: '0 16px 64px rgba(198,62,255,0.25)',
+          border: '1px solid #2E1040', textAlign: 'center',
+        }}>
+          <div style={{
+            fontWeight: 800, fontSize: 24, marginBottom: 6,
+            background: `linear-gradient(90deg, ${GRAD_START}, ${GRAD_END})`,
+            WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent',
+          }}>Ask — Alfred</div>
+          <div style={{ color: '#8B6FA8', fontSize: 13, marginBottom: 28 }}>
+            Enter the access password to continue
+          </div>
+          <input
+            type="password"
+            value={pwInput}
+            onChange={e => { setPwInput(e.target.value); setPwError(false) }}
+            onKeyDown={e => e.key === 'Enter' && verifyAndLogin()}
+            placeholder="Password"
+            autoFocus
+            style={{
+              width: '100%', boxSizing: 'border-box',
+              border: `1px solid ${pwError ? '#FF4466' : '#3D1A5A'}`,
+              borderRadius: 12, padding: '11px 14px', fontSize: 15,
+              background: '#0D0015', color: '#fff', outline: 'none',
+              marginBottom: pwError ? 8 : 16,
+            }}
+          />
+          {pwError && (
+            <div style={{ color: '#FF4466', fontSize: 12, marginBottom: 14 }}>
+              Incorrect password. Please try again.
+            </div>
+          )}
+          <button
+            onClick={verifyAndLogin}
+            disabled={!pwInput}
+            style={{
+              width: '100%', padding: '12px',
+              background: pwInput
+                ? `linear-gradient(135deg, ${GRAD_START}, ${GRAD_END})`
+                : '#2E1040',
+              color: pwInput ? '#fff' : '#6B4A8A',
+              border: 'none', borderRadius: 12, fontSize: 15,
+              fontWeight: 700, cursor: pwInput ? 'pointer' : 'not-allowed',
+              boxShadow: pwInput ? '0 4px 16px rgba(198,62,255,0.35)' : 'none',
+            }}
+          >
+            Enter
+          </button>
+        </div>
+      </div>
+    )
   }
 
   if (!open) {
