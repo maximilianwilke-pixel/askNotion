@@ -1,9 +1,11 @@
 import { useState, useRef, useEffect } from 'react'
 
-const PRIMARY = '#2383E2'
-const USER_BG = '#E8F4FD'
+const GRAD_START = '#7B6BFF'
+const GRAD_END = '#C63EFF'
+const HEADER_BG = '#1A0828'
+const USER_BG = '#F0E8FF'
 const BOT_BG = '#F7F7F5'
-const TEXT = '#37352F'
+const TEXT = '#1A0828'
 
 interface Message {
   id: number
@@ -14,7 +16,7 @@ interface Message {
 const INITIAL_MESSAGES: Message[] = [
   {
     id: 1,
-    text: "Hi! I'm your Notion assistant. Ask me anything about your workspace or company policies.",
+    text: "Hi! I'm Alfred, your AI assistant. Ask me anything about your workspace or company policies.",
     sender: 'bot',
   },
 ]
@@ -101,15 +103,15 @@ export default function App() {
         <button
           onClick={() => setOpen(true)}
           style={{
-            background: PRIMARY,
+            background: `linear-gradient(135deg, ${GRAD_START}, ${GRAD_END})`,
             color: '#fff',
             border: 'none',
             borderRadius: '50%',
-            width: 56,
-            height: 56,
-            fontSize: 24,
+            width: 60,
+            height: 60,
+            fontSize: 26,
             cursor: 'pointer',
-            boxShadow: '0 4px 16px rgba(0,0,0,0.18)',
+            boxShadow: '0 4px 20px rgba(198,62,255,0.4)',
           }}
         >
           💬
@@ -119,15 +121,15 @@ export default function App() {
   }
 
   return (
-    <div style={{ position: 'fixed', bottom: 24, right: 24, width: 380, fontFamily: 'inherit', zIndex: 9999 }}>
+    <div style={{ position: 'fixed', bottom: 24, right: 24, width: 440, fontFamily: 'inherit', zIndex: 9999 }}>
       <div
         style={{
           background: '#fff',
-          borderRadius: 16,
-          boxShadow: '0 8px 32px rgba(0,0,0,0.14)',
+          borderRadius: 20,
+          boxShadow: '0 12px 48px rgba(198,62,255,0.2)',
           display: 'flex',
           flexDirection: 'column',
-          height: 540,
+          height: 640,
           overflow: 'hidden',
           border: '1px solid #E8E8E5',
         }}
@@ -135,17 +137,23 @@ export default function App() {
         {/* Header */}
         <div
           style={{
-            background: PRIMARY,
+            background: HEADER_BG,
             color: '#fff',
-            padding: '14px 16px',
+            padding: '16px 18px',
             display: 'flex',
             alignItems: 'center',
-            gap: 10,
+            gap: 12,
           }}
         >
           <div style={{ flex: 1 }}>
-            <div style={{ fontWeight: 700, fontSize: 15 }}>askNotion</div>
-            <div style={{ fontSize: 12, opacity: 0.8 }}>Your Notion AI assistant</div>
+            <div style={{
+              fontWeight: 800,
+              fontSize: 17,
+              background: `linear-gradient(90deg, ${GRAD_START}, ${GRAD_END})`,
+              WebkitBackgroundClip: 'text',
+              WebkitTextFillColor: 'transparent',
+            }}>Ask — Alfred</div>
+            <div style={{ fontSize: 12, opacity: 0.5, marginTop: 2 }}>Your AI assistant</div>
           </div>
           <button onClick={restartChat} title="Restart conversation" style={iconBtn}>
             ↻
@@ -184,7 +192,7 @@ export default function App() {
                   color: TEXT,
                   fontSize: 14,
                   lineHeight: 1.55,
-                  border: msg.sender === 'bot' ? '1px solid #E8E8E5' : 'none',
+                  border: msg.sender === 'bot' ? '1px solid #EDE0FF' : 'none',
                   whiteSpace: 'pre-wrap',
                 }}
               >
@@ -201,7 +209,7 @@ export default function App() {
                 padding: '11px 14px',
                 background: BOT_BG,
                 borderRadius: '16px 16px 16px 4px',
-                border: '1px solid #E8E8E5',
+                border: '1px solid #EDE0FF',
                 width: 'fit-content',
               }}
             >
@@ -228,9 +236,9 @@ export default function App() {
                   key={rec}
                   onClick={() => handleSend(rec)}
                   style={{
-                    background: '#F0F7FF',
-                    border: `1px solid ${PRIMARY}44`,
-                    color: PRIMARY,
+                    background: '#F5EEFF',
+                    border: `1px solid ${GRAD_END}44`,
+                    color: GRAD_END,
                     borderRadius: 10,
                     padding: '8px 12px',
                     fontSize: 13,
@@ -251,8 +259,8 @@ export default function App() {
         {/* Input */}
         <div
           style={{
-            padding: '10px 14px',
-            borderTop: '1px solid #E8E8E5',
+            padding: '12px 16px',
+            borderTop: '1px solid #EDE0FF',
             display: 'flex',
             gap: 8,
             background: '#fff',
@@ -266,9 +274,9 @@ export default function App() {
             placeholder="Ask me anything..."
             style={{
               flex: 1,
-              border: '1px solid #E8E8E5',
-              borderRadius: 10,
-              padding: '9px 12px',
+              border: '1px solid #EDE0FF',
+              borderRadius: 12,
+              padding: '10px 14px',
               fontSize: 14,
               outline: 'none',
               background: thinking ? '#F9FAFB' : '#fff',
@@ -279,16 +287,19 @@ export default function App() {
             onClick={() => handleSend()}
             disabled={thinking || !input.trim()}
             style={{
-              background: thinking || !input.trim() ? '#E8E8E5' : PRIMARY,
+              background: thinking || !input.trim()
+                ? '#E8E8E5'
+                : `linear-gradient(135deg, ${GRAD_START}, ${GRAD_END})`,
               color: thinking || !input.trim() ? '#9CA3AF' : '#fff',
               border: 'none',
-              borderRadius: 10,
-              width: 40,
-              height: 40,
+              borderRadius: 12,
+              width: 42,
+              height: 42,
               cursor: thinking || !input.trim() ? 'not-allowed' : 'pointer',
               fontSize: 18,
               flexShrink: 0,
-              transition: 'background 0.15s',
+              transition: 'opacity 0.15s',
+              boxShadow: thinking || !input.trim() ? 'none' : '0 2px 12px rgba(198,62,255,0.35)',
             }}
           >
             ↑
